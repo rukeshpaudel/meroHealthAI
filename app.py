@@ -2,10 +2,11 @@ import gradio as gr
 import os
 import time
 
-# Chatbot demo with multimodal input (text, markdown, LaTeX, code blocks, image, audio, & video). Plus shows support for streaming text.
+# Chatbot demo with multimodal input (text, markdown, LaTeX, code blocks, image, audio, & video).
+# Plus shows support for streaming text.
 
 
-def print_like_dislike(x: gr.LikeData):
+def print_like_dislike(x):
     print(x.index, x.value, x.liked)
 
 
@@ -29,19 +30,23 @@ def bot(history):
 
 
 with gr.Blocks() as demo:
+    image_path = os.path.join(
+        os.path.dirname(__file__),
+        "utils",
+        "images",
+        "health_assistant_chatbot_icon.png",
+    )
     chatbot = gr.Chatbot(
         [],
         elem_id="chatbot",
         bubble_full_width=False,
-        avatar_images=(None, "utils\images\health_assitant_chatbot_icon.png"),
+        avatar_images=(None, image_path),
     )
 
     with gr.Row():
         txt = gr.Textbox(
-            scale=4,
             show_label=False,
             placeholder="Enter text and press enter, or upload an image",
-            container=False,
         )
         btn = gr.UploadButton("📁", file_types=["image", "video", "audio"])
 
@@ -53,10 +58,6 @@ with gr.Blocks() as demo:
         bot, chatbot, chatbot
     )
 
-    chatbot.like(print_like_dislike, None, None)
-
-
 demo.queue()
 if __name__ == "__main__":
-    demo.launch(server_port=7860)
-
+    demo.launch()
