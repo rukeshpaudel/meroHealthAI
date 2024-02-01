@@ -46,17 +46,38 @@ with gr.Blocks() as demo:
     with gr.Row():
         txt = gr.Textbox(
             show_label=False,
-            placeholder="Enter text and press enter, or upload an image",
         )
-        btn = gr.UploadButton("📁", file_types=["image", "video", "audio"])
 
-    txt_msg = txt.submit(add_text, [chatbot, txt], [chatbot, txt], queue=False).then(
-        bot, chatbot, chatbot, api_name="bot_response"
-    )
-    txt_msg.then(lambda: gr.Textbox(interactive=True), None, [txt], queue=False)
-    file_msg = btn.upload(add_file, [chatbot, btn], [chatbot], queue=False).then(
-        bot, chatbot, chatbot
-    )
+    with gr.Tab("Chatbot"):
+        chatbot = gr.Chatbot(
+            [],
+            elem_id="chatbot",
+            bubble_full_width=False,
+            avatar_images=(None, "utils\images\health_assitant_chatbot_icon.png"),
+        )
+
+        with gr.Row():
+            txt = gr.Textbox(
+                scale=4,
+                show_label=False,
+                placeholder="Enter text and press enter, or upload an image",
+                container=False,
+            )
+            btn = gr.UploadButton("📁", file_types=["image", "video", "audio"])
+
+        txt_msg = txt.submit(
+            add_text, [chatbot, txt], [chatbot, txt], queue=False
+        ).then(bot, chatbot, chatbot, api_name="bot_response")
+        txt_msg.then(lambda: gr.Textbox(interactive=True), None, [txt], queue=False)
+        file_msg = btn.upload(add_file, [chatbot, btn], [chatbot], queue=False).then(
+            bot, chatbot, chatbot
+        )
+
+        chatbot.like(print_like_dislike, None, None)
+
+    with gr.Tab("Medical Report storage"):
+        with gr.Row("Upload your document here:"):
+            pass
 
 demo.queue()
 if __name__ == "__main__":
