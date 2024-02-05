@@ -1,9 +1,10 @@
 import openai
 from openai import OpenAI
 import gradio as gr
+import os
 
 client = OpenAI(
-        api_key = "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"  # Set your API key securely
+        api_key = os.environ["OPENAI_API_KEY"]  # Set your API key securely
         )
 class SpecializedDoctor:
     def __init__(self, specialty):
