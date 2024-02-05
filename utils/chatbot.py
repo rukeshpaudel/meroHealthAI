@@ -1,11 +1,10 @@
-import openai
 from openai import OpenAI
 import gradio as gr
 import os
 
-client = OpenAI(
-        api_key = os.environ["OPENAI_API_KEY"]  # Set your API key securely
-        )
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])  # Set your API key securely
+
+
 class SpecializedDoctor:
     def __init__(self, specialty):
         self.specialty = specialty
@@ -32,6 +31,7 @@ class SpecializedDoctor:
         )
         return response.choices[0].message.content.strip()
 
+
 def chat_response(message, history):
     # Assuming you have only one doctor instance:
     doctor = SpecializedDoctor("Cardiology")  # Change here if you have more
@@ -43,12 +43,11 @@ def chat_response(message, history):
         history = [history]
     history.append({"role": "user", "content": message})
     history.append({"role": "assistant", "content": doctor_response})
-    return "", history
+    return [{"role": "assistant", "content": doctor_response}], history
+
 
 # Create the Gradio interface
-iface = gr.ChatInterface(
-    chat_response, title="Cardiologist Assistant", theme="dark"
-)
+iface = gr.ChatInterface(chat_response, title="Cardiologist Assistant")
 
 # Launch the interface
 iface.launch()
