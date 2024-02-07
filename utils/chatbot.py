@@ -1,55 +1,50 @@
-from  openai import OpenAI
-import gradio as gr
+from openai import OpenAI 
 import os
+import gradio as gr
 
 client = OpenAI(
-    # This is the default and can be omitted
-    api_key=os.environ.get("OPENAI_API_KEY"),
+    api_key=os.environ['QUALZ_OPEN_API_KEY']
+) 
+
+assistant = client.beta.assistants.create(
+    name="meroHeatlhAI",
+    instructions="You are a highly qualified and skilled doctor who can ask all the right questions to the patient and create an engaging and interesting conversation and make patients let out all the diseases they are suffering from. Then you will create a medical report based on the symptoms. If you are 100% sure, you can also predict the disease else just report the symptoms in a formal formatted diagnosis report. Make sure to include all the vital informations by asking the patients. Ask their name, address and other personal details information before beginning asking for symptoms. Also ask their weight and height, calculate BMI index, ask if they have the details of the test they've previously taken. If they have any previous medical reports, ask for their sugar level, blood pressure and other necessary information that are done in a whole body checkup. Ask one question at a time so that the user doesn't feel overwhelmed. After completing asking the symptoms, automatically generate the symptoms in a medical report like format along with the patient's information.",
+    tools=[{"type": "code_interpreter"}],
+    model="gpt-4-turbo-preview"
 )
 
-def chat_response(prompt, history=[]):
-    """
-    Provides a chatbot response based on the given prompt and history.
+def chat_response():
 
-    Args:
-        prompt (str): The user's input prompt.
-        history (list, optional): List of previous interactions (user and assistant messages). Defaults to [].
+    thread = client.beta.threads.create()
 
-    Returns:
-        str: The assistant's response.
-    """
-
-    # Update history with the user's prompt
-    history.append({"role": "user", "content": prompt})
-
-    # Generate response using OpenAI's chat completion API
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": prompt}],
-        max_tokens=150,
-        temperature=0.7,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0.6,
-        stop=None,
-        n=1
+    message = client.beta.threads.messages.create(
+        thread_id=thread.id,
+        role="user",
+        content="I am having panic attack. Can you help me?"
     )
-    assistant_response = response.choices[0].message.content
 
-    # Update history with the assistant's response
-    history.append({"role": "assistant", "content": assistant_response})
+    run = client.beta.threads.runs.create(
+    thread_id=thread.id,
+    assistant_id=assistant.id,
+    instructions="Please address the user as Jane Doe. The user has a premium account."
+    )
 
-    return assistant_response, history
+    run = client.beta.threads.runs.retrieve(
+    thread_id=thread.id,
+    run_id=run.id
+    )
 
+    messages = client.beta.threads.messages.list(
+    thread_id=thread.id
+    )
 # Create the Gradio interface
-interface = gr.Interface(
+with gr.Blocks() as iface:
+    gr.Textbox(lines=3, label="Set the context and ask your question:")
+    gr.ChatInterface(    
     fn=chat_response,
-    inputs=gr.Textbox(lines=3, label="Enter your prompt:"),
-    outputs="text",
-    title="OpenAI Chatbot: Ask Me Anything!",
-    #theme="dark",
-    #use_legacy_return=True,  # Ensure all outputs are returned to Gradio
+    title="Chat with this bot!",
+    
 )
 
 # Launch the interface
-interface.launch()
+iface.launch()
