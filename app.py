@@ -86,15 +86,15 @@ def main(query, history):
 # Create a Gradio Interface
 with gr.Blocks() as iface:
     with gr.Tab("MeroHealthAI Chatbot"):
-        gr.Markdown("MeroHealthAI is an AI assited chatbot that gathers symptoms from the user, documents it and sends it to the nearest most relevant doctor available. Our app also suppors medical report analysis")
+       # gr.Markdown("MeroHealthAI is an AI assited chatbot that gathers symptoms from the user, documents it and sends it to the nearest most relevant doctor available. Our app also suppors medical report analysis")
         symptom_chatbot = gr.ChatInterface(
                 main
-            )  # , description="MeroHealthAI is an AI assited chatbot that gathers symptoms from the user, documents it and sends it to the nearest most relevant doctor available. Our app also suppors medical report analysis",\
-            #                                 examples=["How can I find the right doctor for my ailment?",\
-            #                                         "How do I contact a doctor without making an appointment?",\
+             , description="MeroHealthAI is an AI assited chatbot that gathers symptoms from the user, documents it and sends it to the nearest most relevant doctor available. Our app also suppors medical report analysis",\
+                                            examples=["How can I find the right doctor for my ailment?",\
+                                                    "How do I contact a doctor without making an appointment?",\
 
-            #                                                 "I don't understant this medical report, can you describe it to me?", \
-            #                                                 "I have been having severe panic and anxiety attack, what could be the reason behind it?"]).queue()
+                                                            "I don't understant this medical report, can you describe it to me?", \
+                                                            "I have been having severe panic and anxiety attack, what could be the reason behind it?"]).queue()
 
         symptom_chatbot
     with gr.Tab("Contact Doctor "):
