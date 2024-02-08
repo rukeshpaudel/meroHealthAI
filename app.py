@@ -1,84 +1,104 @@
-import gradio as gr
-import os
 import time
+import os
+import gradio as gr
+from utils.doc_contact import Doctor
+from openai import OpenAI
 
-# Chatbot demo with multimodal input (text, markdown, LaTeX, code blocks, image, audio, & video).
-# Plus shows support for streaming text.
+client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
+
+# Initialize the client
+# Set your OpenAI API key
+
+"""file = client.files.create(
+    file=open("songs.txt", "rb"),
+    purpose='assistants'
+)"""
+
+# Step 1: Create an Assistant
+# assistant = client.beta.assistants.create(
+#     name="MeroHealthAI",
+#     instructions="You are a highly qualified and skilled doctor \
+#                     who can ask all the right questions to the patient \
+#                         and create an engaging and interesting conversation \
+#                             and make patients let out all the diseases they are \
+#                                 suffering from. Then you will create a medical report \
+#                                     based on the symptoms. If you are 100% sure, you can also\
+#                                           predict the disease else just report the symptoms in a formal \
+#                                             formatted diagnosis report. Make sure to include all the vital \
+#                                                 informations by asking the patients. Ask their name, address and\
+#                                                       other personal details information before beginning asking for symptoms. \
+#                                                         Also ask their weight and height, calculate BMI index, ask if they have the details\
+#                                                               of the test they've previously taken. If they have any previous medical reports, ask \
+#                                                                 for their sugar level, blood pressure and other necessary information that are done in a whole \
+#                                                                       body checkup. Ask one question at a time so that the user doesn't feel overwhelmed. After completing asking the \
+#                                                                       symptoms, automatically generate the symptoms in a medical report like format along with the patient's information.",
+#     model="gpt-3.5-turbo",
+#   #  file_ids=[file.id],
+#     #tools=[{"type": "retrieval"}]
+# )
+# Step 2: Create a Thread
+thread = client.beta.threads.create()
 
 
-def print_like_dislike(x):
-    print(x.index, x.value, x.liked)
+def create_thread():
+    thread = client.beta.threads.create()
+    return thread.id
 
 
-def add_text(history, text):
-    history = history + [(text, None)]
-    return history, gr.Textbox(value="", interactive=False)
-
-
-def add_file(history, file):
-    history = history + [((file.name,), None)]
-    return history
-
-
-def bot(history):
-    response = "**That's cool!**"
-    history[-1][1] = ""
-    for character in response:
-        history[-1][1] += character
-        time.sleep(0.05)
-        yield history
-
-
-with gr.Blocks() as demo:
-    image_path = os.path.join(
-        os.path.dirname(__file__),
-        "utils",
-        "images",
-        "health_assistant_chatbot_icon.png",
+def main(query, history):
+    # Step 3: Add a Message to a Thread
+    history = (history,)
+    message = client.beta.threads.messages.create(
+        thread_id=thread.id, role="user", content=query
     )
-    chatbot = gr.Chatbot(
-        [],
-        elem_id="chatbot",
-        bubble_full_width=False,
-        avatar_images=(None, image_path),
+
+    # Step 4: Run the Assistant
+    run = client.beta.threads.runs.create(
+        thread_id=thread.id,
+        assistant_id="asst_x34DeLtsxGXQBZCwN5aZhfBf",
+        instructions="User is a health patient, who is suffering from {disease}. You are supposed to create a medical report based on the symptoms. If you are 100% sure, you can also predict the disease else just report the symptoms in a formal formatted diagnosis report.\
+                        Make sure to include all the vital informations by asking the patients. Ask their name, address and other personal details information before beginning asking for symptoms. Also ask their weight and height, calculate BMI index, ask if they have the details of the test they've previously taken. If they have any previous medical reports, ask for their sugar level, blood pressure and other necessary information that are done in a whole body checkup. Ask one question at a time so that the user doesn't feel overwhelmed. After completing asking the symptoms, automatically generate the symptoms in a medical report like format along with the patient's information.",
     )
 
-    with gr.Row():
-        txt = gr.Textbox(
-            show_label=False,
+    while True:
+        # Wait for 5 seconds
+        time.sleep(0.5)
+
+        # Retrieve the run status
+        run_status = client.beta.threads.runs.retrieve(
+            thread_id=thread.id, run_id=run.id
         )
 
-    with gr.Tab("Chatbot"):
-        chatbot = gr.Chatbot(
-            [],
-            elem_id="chatbot",
-            bubble_full_width=False,
-            avatar_images=(None, "utils\images\health_assitant_chatbot_icon.png"),
-        )
 
+        # If run is completed, get messages
+        if run_status.status == "completed":
+            messages = client.beta.threads.messages.list(thread_id=thread.id)
+            response = ""
+# Create a Gradio Interface
+with gr.Blocks() as iface:
+    with gr.Tab("MeroHealthAI Chatbot"):
+        gr.Markdown("MeroHealthAI is an AI assited chatbot that gathers symptoms from the user, documents it and sends it to the nearest most relevant doctor available. Our app also suppors medical report analysis")
         with gr.Row():
-            txt = gr.Textbox(
-                scale=4,
-                show_label=False,
-                placeholder="Enter text and press enter, or upload an image",
-                container=False,
-            )
-            btn = gr.UploadButton("📁", file_types=["image", "video", "audio"])
+            symptom_chatbot = gr.ChatInterface(
+                main
+            )  # , description="MeroHealthAI is an AI assited chatbot that gathers symptoms from the user, documents it and sends it to the nearest most relevant doctor available. Our app also suppors medical report analysis",\
+            #                                 examples=["How can I find the right doctor for my ailment?",\
+            #                                         "How do I contact a doctor without making an appointment?",\
 
-        txt_msg = txt.submit(
-            add_text, [chatbot, txt], [chatbot, txt], queue=False
-        ).then(bot, chatbot, chatbot, api_name="bot_response")
-        txt_msg.then(lambda: gr.Textbox(interactive=True), None, [txt], queue=False)
-        file_msg = btn.upload(add_file, [chatbot, btn], [chatbot], queue=False).then(
-            bot, chatbot, chatbot
+            #                                                 "I don't understant this medical report, can you describe it to me?", \
+            #                                                 "I have been having severe panic and anxiety attack, what could be the reason behind it?"]).queue()
+
+            symptom_chatbot
+    with gr.Tab("Contact Doctor "):
+        profession_key = gr.Textbox(label="Profession", interactive=True)
+        doc_info = gr.Textbox(label="Doctor Information")  # Define textbox globally
+
+        gr.Button("Display_profession").click(
+            # Pass textbox element directly
+            Doctor.display_profession,
+            inputs=profession_key,
+            outputs=doc_info,
         )
 
-        chatbot.like(print_like_dislike, None, None)
-
-    with gr.Tab("Medical Report storage"):
-        with gr.Row("Upload your document here:"):
-            pass
-
-demo.queue()
 if __name__ == "__main__":
-    demo.launch()
+    iface.launch()

@@ -1,0 +1,6 @@
+# Example prompts for cardiology:
+* What are the possible causes of the patient's symptoms?
+* Consider their medical history and risk factors.
+* Are there any diagnostic tests you recommend?
+* What treatment options could be appropriate?
+* Remember, I cannot provide medical advice, only information.
