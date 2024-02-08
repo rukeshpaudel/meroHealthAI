@@ -18,7 +18,21 @@ client = OpenAI(api_key=os.environ['OPENAI_API_KEY'])
 # Step 1: Create an Assistant
 assistant = client.beta.assistants.create(
     name="MeroHealthAI",
-    instructions="You are a highly qualified and skilled doctor who can ask all the right questions to the patient and create an engaging and interesting conversation and make patients let out all the diseases they are suffering from. Then you will create a medical report based on the symptoms. If you are 100% sure, you can also predict the disease else just report the symptoms in a formal formatted diagnosis report. Make sure to include all the vital informations by asking the patients. Ask their name, address and other personal details information before beginning asking for symptoms. Also ask their weight and height, calculate BMI index, ask if they have the details of the test they've previously taken. If they have any previous medical reports, ask for their sugar level, blood pressure and other necessary information that are done in a whole body checkup. Ask one question at a time so that the user doesn't feel overwhelmed. After completing asking the symptoms, automatically generate the symptoms in a medical report like format along with the patient's information.",
+    instructions="You are a highly qualified and skilled doctor \
+                    who can ask all the right questions to the patient \
+                        and create an engaging and interesting conversation \
+                            and make patients let out all the diseases they are \
+                                suffering from. Then you will create a medical report \
+                                    based on the symptoms. If you are 100% sure, you can also\
+                                          predict the disease else just report the symptoms in a formal \
+                                            formatted diagnosis report. Make sure to include all the vital \
+                                                informations by asking the patients. Ask their name, address and\
+                                                      other personal details information before beginning asking for symptoms. \
+                                                        Also ask their weight and height, calculate BMI index, ask if they have the details\
+                                                              of the test they've previously taken. If they have any previous medical reports, ask \
+                                                                for their sugar level, blood pressure and other necessary information that are done in a whole \
+                                                                      body checkup. Ask one question at a time so that the user doesn't feel overwhelmed. After completing asking the \
+                                                                      symptoms, automatically generate the symptoms in a medical report like format along with the patient's information.",
     model="gpt-3.5-turbo",
   #  file_ids=[file.id],
     #tools=[{"type": "retrieval"}]
@@ -40,7 +54,9 @@ def main(query, history):
     run = client.beta.threads.runs.create(
         thread_id=thread.id,
         assistant_id=assistant.id,
-        instructions="User is a health patient, who is suffering from some kind of illness. You are supposed to create a medical report based on the symptoms. If you are 100% sure, you can also predict the disease else just report the symptoms in a formal formatted diagnosis report. Make sure to include all the vital informations by asking the patients. Ask their name, address and other personal details information before beginning asking for symptoms. Also ask their weight and height, calculate BMI index, ask if they have the details of the test they've previously taken. If they have any previous medical reports, ask for their sugar level, blood pressure and other necessary information that are done in a whole body checkup. Ask one question at a time so that the user doesn't feel overwhelmed. After completing asking the symptoms, automatically generate the symptoms in a medical report like format along with the patient's information."
+        instructions="User is a health patient, who is suffering from some kind of \
+                        illness. You are supposed to create a medical report based on the symptoms. If you are 100% sure, you can also predict the disease else just report the symptoms in a formal formatted diagnosis report.\
+                        Make sure to include all the vital informations by asking the patients. Ask their name, address and other personal details information before beginning asking for symptoms. Also ask their weight and height, calculate BMI index, ask if they have the details of the test they've previously taken. If they have any previous medical reports, ask for their sugar level, blood pressure and other necessary information that are done in a whole body checkup. Ask one question at a time so that the user doesn't feel overwhelmed. After completing asking the symptoms, automatically generate the symptoms in a medical report like format along with the patient's information."
     )
 
     while True:
@@ -71,14 +87,12 @@ def main(query, history):
 # Create a Gradio Interface
 
 iface = gr.ChatInterface(main, title="MeroHealthAI- Your HealthAI assistant ",\
-                          description="SAFe Specialist guiding transitions with realistic and \
-                            optimistic advice towards a product centric approach",\
+                          description="MeroHealthAI is an AI assited chatbot that gathers symptoms from the user, documents it and sends it to the nearest most relevant doctor available. Our app also suppors medical report analysis",\
                                 examples=["How can I find the right doctor for my ailment?",\
                                           "How do I contact a doctor without making an appointment?",\
                                             "?",\
-                                                "How do I deal with cultural resistance in SAFe adoption?", \
-                                                    "What's your advice for an org with many different digital solutions?",\
-                                                        "Could you walk me through the step-by-step process of moving into SAFe?"]).queue()
+                                                "I don't understant this medical report, can you describe it to me?", \
+                                                    "I have been having severe panic and anxiety attack, what could be the reason behind it?"]).queue()
 
 if __name__ == "__main__":
     iface.launch()
