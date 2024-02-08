@@ -69,24 +69,15 @@ def main(query, history):
             thread_id=thread.id, run_id=run.id
         )
 
+
         # If run is completed, get messages
         if run_status.status == "completed":
             messages = client.beta.threads.messages.list(thread_id=thread.id)
             response = ""
-
-            data = messages.data
-            first_thread_message = data[0]
-            content = first_thread_message.content
-            response = content[0].text.value
-            return response
-        else:
-            continue
-
-
 # Create a Gradio Interface
 with gr.Blocks() as iface:
     with gr.Tab("MeroHealthAI Chatbot"):
-        # gr.Markdown("MeroHealthAI is an AI assited chatbot that gathers symptoms from the user, documents it and sends it to the nearest most relevant doctor available. Our app also suppors medical report analysis")
+        gr.Markdown("MeroHealthAI is an AI assited chatbot that gathers symptoms from the user, documents it and sends it to the nearest most relevant doctor available. Our app also suppors medical report analysis")
         with gr.Row():
             symptom_chatbot = gr.ChatInterface(
                 main
