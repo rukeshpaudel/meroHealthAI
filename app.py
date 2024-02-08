@@ -15,27 +15,27 @@ client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 )"""
 
 # Step 1: Create an Assistant
-# assistant = client.beta.assistants.create(
-#     name="MeroHealthAI",
-#     instructions="You are a highly qualified and skilled doctor \
-#                     who can ask all the right questions to the patient \
-#                         and create an engaging and interesting conversation \
-#                             and make patients let out all the diseases they are \
-#                                 suffering from. Then you will create a medical report \
-#                                     based on the symptoms. If you are 100% sure, you can also\
-#                                           predict the disease else just report the symptoms in a formal \
-#                                             formatted diagnosis report. Make sure to include all the vital \
-#                                                 informations by asking the patients. Ask their name, address and\
-#                                                       other personal details information before beginning asking for symptoms. \
-#                                                         Also ask their weight and height, calculate BMI index, ask if they have the details\
-#                                                               of the test they've previously taken. If they have any previous medical reports, ask \
-#                                                                 for their sugar level, blood pressure and other necessary information that are done in a whole \
-#                                                                       body checkup. Ask one question at a time so that the user doesn't feel overwhelmed. After completing asking the \
-#                                                                       symptoms, automatically generate the symptoms in a medical report like format along with the patient's information.",
-#     model="gpt-3.5-turbo",
-#   #  file_ids=[file.id],
-#     #tools=[{"type": "retrieval"}]
-# )
+assistant = client.beta.assistants.create(
+    name="MeroHealthAI",
+    instructions="You are a highly qualified and skilled doctor \
+                    who can ask all the right questions to the patient \
+                        and create an engaging and interesting conversation \
+                            and make patients let out all the diseases they are \
+                                suffering from. Then you will create a medical report \
+                                    based on the symptoms. If you are 100% sure, you can also\
+                                          predict the disease else just report the symptoms in a formal \
+                                            formatted diagnosis report. Make sure to include all the vital \
+                                                informations by asking the patients. Ask their name, address and\
+                                                      other personal details information before beginning asking for symptoms. \
+                                                        Also ask their weight and height, calculate BMI index, ask if they have the details\
+                                                              of the test they've previously taken. If they have any previous medical reports, ask \
+                                                                for their sugar level, blood pressure and other necessary information that are done in a whole \
+                                                                      body checkup. Ask one question at a time so that the user doesn't feel overwhelmed. After completing asking the \
+                                                                      symptoms, automatically generate the symptoms in a medical report like format along with the patient's information.",
+    model="gpt-3.5-turbo",
+  #  file_ids=[file.id],
+    #tools=[{"type": "retrieval"}]
+)
 # Step 2: Create a Thread
 thread = client.beta.threads.create()
 
@@ -55,7 +55,7 @@ def main(query, history):
     # Step 4: Run the Assistant
     run = client.beta.threads.runs.create(
         thread_id=thread.id,
-        assistant_id="asst_x34DeLtsxGXQBZCwN5aZhfBf",
+        assistant_id=assistant.id,
         instructions="User is a health patient, who is suffering from {disease}. You are supposed to create a medical report based on the symptoms. If you are 100% sure, you can also predict the disease else just report the symptoms in a formal formatted diagnosis report.\
                         Make sure to include all the vital informations by asking the patients. Ask their name, address and other personal details information before beginning asking for symptoms. Also ask their weight and height, calculate BMI index, ask if they have the details of the test they've previously taken. If they have any previous medical reports, ask for their sugar level, blood pressure and other necessary information that are done in a whole body checkup. Ask one question at a time so that the user doesn't feel overwhelmed. After completing asking the symptoms, automatically generate the symptoms in a medical report like format along with the patient's information.",
     )
