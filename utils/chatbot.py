@@ -1,55 +1,33 @@
-from  openai import OpenAI
 import gradio as gr
-import os
 
-client = OpenAI(
-    # This is the default and can be omitted
-    api_key=os.environ.get("OPENAI_API_KEY"),
-)
+doctor_professions = {
+        "neurologist": "Dr. Ram Hari",
+        "psychiatrist": "Dr. Sita",
+        "cardiologist": "Dr. Deals",
+        "dermatologist": "Dr. Hari",
+    }
 
-def chat_response(prompt, history=[]):
-    """
-    Provides a chatbot response based on the given prompt and history.
+class Doctor:
+    
+    def display_profession(profession_key):
+        # Handle invalid key (same as previous example)
+        if profession_key not in doctor_professions:
+            return "Invalid profession. Please choose from available options."
 
-    Args:
-        prompt (str): The user's input prompt.
-        history (list, optional): List of previous interactions (user and assistant messages). Defaults to [].
+        doctor_data = doctor_professions[profession_key]
+        # Build desired output format (adjust to your preference)
+        output = f"\n**Doctor details:**\n - Name: {doctor_data}\n - Profession: {profession_key}"
 
-    Returns:
-        str: The assistant's response.
-    """
+        return output
 
-    # Update history with the user's prompt
-    history.append({"role": "user", "content": prompt})
 
-    # Generate response using OpenAI's chat completion API
-    response = client.chat.completions.create(
-        model="gpt-3.5-turbo",
-        messages=[{"role": "user", "content": prompt}],
-        max_tokens=150,
-        temperature=0.7,
-        top_p=1,
-        frequency_penalty=0,
-        presence_penalty=0.6,
-        stop=None,
-        n=1
+with gr.Blocks() as block:
+    profession_key = gr.Textbox(label="Profession", interactive=True)
+    doc_info = gr.Textbox(label="Doctor Information")  # Define textbox globally
+
+    gr.Button("display_profession").click(
+        # Pass textbox element directly
+        Doctor.display_profession, inputs=[profession_key], outputs=doc_info
     )
-    assistant_response = response.choices[0].message.content
 
-    # Update history with the assistant's response
-    history.append({"role": "assistant", "content": assistant_response})
-
-    return assistant_response, history
-
-# Create the Gradio interface
-interface = gr.Interface(
-    fn=chat_response,
-    inputs=gr.Textbox(lines=3, label="Enter your prompt:"),
-    outputs="text",
-    title="OpenAI Chatbot: Ask Me Anything!",
-    #theme="dark",
-    #use_legacy_return=True,  # Ensure all outputs are returned to Gradio
-)
-
-# Launch the interface
-interface.launch()
+block.launch()
