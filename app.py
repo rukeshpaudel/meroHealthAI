@@ -35,8 +35,6 @@ assistant = client.beta.assistants.create(
   #  file_ids=[file.id],
     #tools=[{"type": "retrieval"}]
 )
-# Step 2: Create a Thread
-thread = client.beta.threads.create()
 
 
 def create_thread():
@@ -45,10 +43,13 @@ def create_thread():
 
 
 def main(query, history):
+    # Step 2: Create a Thread
+    thread_id = create_thread()
+
     # Step 3: Add a Message to a Thread
     history = (history,)
     message = client.beta.threads.messages.create(
-        thread_id=thread.id, role="user", content=query
+        thread_id=thread_id, role="user", content=query
     )
 
     # Step 4: Run the Assistant
