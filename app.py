@@ -56,7 +56,7 @@ def main(query, history):
         thread_id=thread.id,
         assistant_id=assistant.id,
         instructions="User is a health patient, who is suffering from {disease}. You are supposed to create a medical report based on the symptoms. If you are 100% sure, you can also predict the disease else just report the symptoms in a formal formatted diagnosis report.\
-                        Make sure to include all the vital informations by asking the patients. Ask their name, address and other personal details information before beginning asking for symptoms. Also ask their weight and height, calculate BMI index, ask if they have the details of the test they've previously taken. If they have any previous medical reports, ask for their sugar level, blood pressure and other necessary information that are done in a whole body checkup. Ask one question at a time so that the user doesn't feel overwhelmed. After completing asking the symptoms, automatically generate the symptoms in a medical report like format along with the patient's information.",
+                        Make sure to include all the vital informations by asking the patients. Ask their name, address and gender before beginning asking for symptoms. Ask one question at a time so that the user doesn't feel overwhelmed. Ask if they have any more symptoms and after completing asking for the detailed symptoms, generate the symptoms in a medical report like format along with the patient's information.",
     )
 
     while True:
