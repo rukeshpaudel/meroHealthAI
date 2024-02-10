@@ -91,9 +91,9 @@ with gr.Blocks() as iface:
                 clear_btn="Find Relevant Doctors"
              , description="MeroHealthAI is an AI assited chatbot that gathers symptoms from the user, documents it and sends it to the nearest most relevant doctor available. Our app also suppors medical report analysis",\
                                             examples=["I am having persistent headache, loss of feeling, tingling, Weakness or loss of muscle strength.",\
-                                            "I am having headache since yesterday, do you know what could be the reason?",\
-                                                            "I don't understant this medical report, can you describe it to me?", \
-                                                            "I have been having severe panic and anxiety attack, what could be the reason behind it?"]).queue()
+                                            "I have been having headache for the past 4 days.",\
+                                                            "My limb looks swollen and my joint hurts.", \
+                                                            "Hello, I have been having severe panic and anxiety attack."]).queue()
 
         symptom_chatbot
     with gr.Tab("Contact Doctor "):
