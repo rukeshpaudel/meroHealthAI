@@ -88,6 +88,7 @@ def main(query, history):
 with gr.Blocks() as iface:
     with gr.Tab("MeroHealthAI Chatbot"):
        # gr.Markdown("MeroHealthAI is an AI assited chatbot that gathers symptoms from the user, documents it and sends it to the nearest most relevant doctor available. Our app also suppors medical report analysis")
+        gr.State(value=None)
         symptom_chatbot = gr.ChatInterface(
                 main,
                 clear_btn="Find Relevant Doctors"
@@ -101,7 +102,7 @@ with gr.Blocks() as iface:
     with gr.Tab("Contact Doctor "):
         profession_key = gr.Textbox(label="Profession", interactive=True)
         doc_info = gr.Textbox(label="Doctor Information")  # Define textbox globally
-
+    
         gr.Button("Find Relevant Doctors").click(
             # Pass textbox element directly
             Doctor.display_profession,
