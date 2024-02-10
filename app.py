@@ -36,6 +36,7 @@ assistant = client.beta.assistants.create(
     #tools=[{"type": "retrieval"}]
 )
 
+thread = client.beta.threads.create()
 
 def create_thread():
     thread = client.beta.threads.create()
@@ -44,7 +45,8 @@ def create_thread():
 
 def main(query, history):
     # Step 2: Create a Thread
-    thread = client.beta.threads.create()
+
+
     # Step 3: Add a Message to a Thread
     history = (history,)
     message = client.beta.threads.messages.create(
