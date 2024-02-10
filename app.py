@@ -44,12 +44,11 @@ def create_thread():
 
 def main(query, history):
     # Step 2: Create a Thread
-    thread_id = create_thread()
-
+    thread = client.beta.threads.create()
     # Step 3: Add a Message to a Thread
     history = (history,)
     message = client.beta.threads.messages.create(
-        thread_id=thread_id, role="user", content=query
+        thread_id=thread.id, role="user", content=query
     )
 
     # Step 4: Run the Assistant
