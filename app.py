@@ -6,6 +6,13 @@ from openai import OpenAI
 
 client = OpenAI(api_key=os.environ["OPENAI_API_KEY"])
 
+def create_thread():
+    thread = client.beta.threads.create()
+    return thread.id
+
+# Initialize thread ID for the current session
+thread_id = create_thread()
+
 # Initialize the client
 # Set your OpenAI API key
 
@@ -36,26 +43,21 @@ assistant = client.beta.assistants.create(
     #tools=[{"type": "retrieval"}]
 )
 
-thread = client.beta.threads.create()
-
-def create_thread():
-    thread = client.beta.threads.create()
-    return thread.id
-
-
 def main(query, history):
-    # Step 2: Create a Thread
-
+    global thread_id  # Ensure we're using the global thread_id variable
+    # Generate a new thread ID if it's a new session
+    if not history:
+        thread_id = create_thread()
 
     # Step 3: Add a Message to a Thread
     history = (history,)
     message = client.beta.threads.messages.create(
-        thread_id=thread.id, role="user", content=query
+        thread_id=thread_id, role="user", content=query
     )
 
     # Step 4: Run the Assistant
     run = client.beta.threads.runs.create(
-        thread_id=thread.id,
+        thread_id=thread_id,
         assistant_id=assistant.id,
         instructions="User is a health patient, who is suffering from {disease}. You are supposed to create a medical report based on the symptoms. If you are 100% sure, you can also predict the disease else just report the symptoms in a formal formatted diagnosis report.\
                         Make sure to include all the vital informations by asking the patients. Ask their name, address and gender before beginning asking for symptoms. Ask one question at a time so that the user doesn't feel overwhelmed. Ask if they have any more symptoms and after completing asking for the detailed symptoms, generate the symptoms in a medical report like format along with the patient's information.",
@@ -67,12 +69,12 @@ def main(query, history):
 
         # Retrieve the run status
         run_status = client.beta.threads.runs.retrieve(
-            thread_id=thread.id, run_id=run.id
+            thread_id=thread_id, run_id=run.id
         )
 
         # If run is completed, get messages
         if run_status.status == "completed":
-            messages = client.beta.threads.messages.list(thread_id=thread.id)
+            messages = client.beta.threads.messages.list(thread_id=thread_id)
             response = ""
 
             data = messages.data
@@ -88,7 +90,7 @@ def main(query, history):
 with gr.Blocks() as iface:
     with gr.Tab("MeroHealthAI Chatbot"):
        # gr.Markdown("MeroHealthAI is an AI assited chatbot that gathers symptoms from the user, documents it and sends it to the nearest most relevant doctor available. Our app also suppors medical report analysis")
-        gr.State(value=None)
+  
         symptom_chatbot = gr.ChatInterface(
                 main,
                 clear_btn="Find Relevant Doctors"
